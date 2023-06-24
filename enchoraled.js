@@ -3,8 +3,8 @@
 // @description  Snipe limiteds in your browser
 // @author       3030ms
 // @version      0.0.1
-// @downloadURL  https://raw.githubusercontent.com/Enchoral/enchoraled/main/enchoraled.js
-// @updateURL    https://raw.githubusercontent.com/Enchoral/enchoraled/main/enchoraled.js
+// @downloadURL  https://greasyfork.org/scripts/469373-enchoraled/code/enchoraled.user.js
+// @updateURL    https://greasyfork.org/scripts/469373-enchoraled/code/enchoraled.user.js
 // @match        *.roblox.com/catalog/*
 // @grant        GM_notification
 // ==/UserScript==
@@ -23,13 +23,6 @@ function uuidv4() {
     (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
 }
 
-function repeatWithInterval(callback, interval) {
-  setTimeout(() => {
-    callback();
-    repeatWithInterval(callback, interval);
-  }, interval);
-}
-
 fetch("https://users.roblox.com/v1/users/authenticated", {credentials: "include"})
     .then(response => {
     userId = response.json().id;
@@ -41,12 +34,11 @@ fetch("https://catalog.roblox.com/", {credentials: "include", method: "POST"})
 })
 
 function run() {
-    setTimeout(() => {
     fetch(`https://economy.roblox.com/v2/assets/${id}/details`, {credentials: "include"})
         .then(response => response.json())
         .then(data => {
         console.log(data);
-        if (data.Remaining !== undefined && data.Remaining !== 0 && data.PriceInRobux === 0) {
+        if (data.Remaining !== null && data.Remaining !== 0 && data.PriceInRobux === 0) {
             let postData = JSON.stringify({
                 collectibleItemId: data.CollectibleItemId,
                 expectedCurrency: 1,
@@ -66,7 +58,7 @@ function run() {
                     var notificationOptions = {body: `Error: ${dataaa}, Item: ${data.Name}`, icon: "http://files.enchoral.me/r/enchoraled.jpg"};
                     new Notification(notificationTitle, notificationOptions);
                 }
-                return;
+                clearInterval(myInterval);
             })
                 .then(response => response.json())
                 .then(dataa => {
@@ -77,13 +69,12 @@ function run() {
                     var notificationOptions1 = {body: `Missed ${data.Name}, Error: ${dataa}`, icon: "http://files.enchoral.me/r/enchoraled.jpg"};
                     new Notification(notificationTitle, notificationOptions1);
                 }
-                return;
+                clearInterval(myInterval);
             })
                 .catch(error => console.log(error));
-        }
+        } else if (data.PriceInRobux !== null && data.PriceInRobux !== 0) {clearInterval(myInterval);};
     })
         .catch(error => console.log(error));
-    }, 1);
 }
 
-run();
+var myInterval = setInterval(run, 150);
