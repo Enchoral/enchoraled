@@ -7,6 +7,7 @@
 // @updateURL    https://raw.githubusercontent.com/Enchoral/enchoraled/main/enchoraled.js
 // @match        *.roblox.com/catalog/*
 // @grant        GM_notification
+// @license      WTFPL
 // ==/UserScript==
 
 Notification.requestPermission();
